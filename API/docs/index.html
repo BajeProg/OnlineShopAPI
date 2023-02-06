@@ -1,0 +1,580 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>API Documentation</title>
+</head>
+<style>
+    .body{
+        font-family: "arial";
+        background-color: #BFBFBF;
+        color: #0D0D0D;
+        padding: 1%;
+    }
+    .content{
+        background-color: #F2F2F2;
+        border-radius: 20px;
+        padding: 10px;
+    }
+</style>
+<body class="body">
+
+    <h1>Документация к API</h1>
+    <div class="content">
+        <div class="info">
+            <h2>Основная информация</h2>
+            <table border="2" width="50%" cellspacing="0" bordercolor="#36403A">
+                    <tr>
+                        <td widht="10%" bgcolor="#DCF2E6">Автор</td>
+                        <td>Владимир Баженов</td>
+                    </tr>
+                    <tr>
+                        <td widht="10%" bgcolor="#DCF2E6">Задача</td>
+                        <td>Разработать API, которая дает возможность сторонним приложениям, сайтам и т.д. добавлять, удалять, изменять и просматривать данные из базы данных интернет-магазина</td>
+                    </tr>
+                    <tr>
+                        <td widht="10%" bgcolor="#DCF2E6">Бизнес постановка</td>
+                        <td>API нужно для обращения приложения к базе данных интернет-магазина. Это обеспечит пользователям удобство в пользовании услуг магазина и увеличит продажи</td>
+                    </tr>
+            </table>
+        </div>
+        <div class="change_story">
+            <h2>История изменений</h2>
+            <table border="2" width="50%" cellspacing="0" bordercolor="#36403A">
+                <tr bgcolor="#DCF2E6">
+                    <td widht="5%">Версия</td>
+                    <td widht="5%">Дата</td>
+                    <td widht="5%">Автор</td>
+                    <td>Описание изменений</td>
+                </tr>
+                <tr>
+                    <td widht="5%">1.0</td>
+                    <td widht="5%">30.01.2023</td>
+                    <td widht="5%">Владимир Баженов</td>
+                    <td>Создана первая версия документа</td>
+                </tr>
+            </table>
+        </div>
+        <div class="query_answer">
+            <h2>Запрос/Ответ</h2>
+            <table border="2" width="80%" cellspacing="0" bordercolor="#36403A">
+                <tr bgcolor="#DCF2E6">
+                    <td width="50%">Запрос</td>
+                    <td>Ответ</td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={<a href="#token">token</a>}&type=register_user&login={<a href="#login">login</a>}&pass={<a href="#pass">pass</a>}</td>
+                    <td>{<br>
+                        "error":false,<br>  
+                        "type":"SUCCESS",<br>   
+                        "title":"Успех!",<br>
+                        "desc":"Пользователь зарегестрирован!",<br> 
+                        "other":null,<br>   
+                        "datetime":{<br>        
+                            "Y":"2023",<br>     
+                            "m":"01",<br>       
+                            "d":"30",<br>       
+                            "H":"15",<br>       
+                            "i":"52",<br>       
+                            "s":"58",<br>       
+                            "full":"2023-01-30 15:52:58"<br>    
+                        }<br>
+                    
+                    }
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=auth_user&login={login}&pass={pass}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Пользователь авторизирован!",<br>
+                        "other":[<br>
+                            {<br>
+                                "id":"16",<br>
+                                "login":"Vasya2004",<br>
+                                "image":"https://cdn-icons-png.flaticon.com/512/1946/1946429.png",<br>
+                                "cart":"5",<br>
+                                "favorites":"2"<br>
+                            }
+                        ],<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"55",<br>
+                            "s":"39",<br>
+                            "full":"2023-01-30 15:55:39"<br>
+                        }<br>
+                    
+                    }
+                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=load_user_image&userid={userid}&url={url}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Фотография загружена",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    
+                    }
+                    
+                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=list_product</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Список продукции!",<br>
+                        "other":[<br>
+                            {<br>
+                                "id":"1",<br>
+                                "name":"MSI RTX 3070",<br>
+                                "description":"videocard"<br>
+                            },<br>
+                            {<br>
+                                "id":"3",<br>
+                                "name":"Ryzen 5 3600",<br>
+                                "description":"processor"<br>
+                            }<br>
+                        ],<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"16",<br>
+                            "i":"05",<br>
+                            "s":"13",<br>
+                            "full":"2023-01-30 16:05:13"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=add_product&name={name}&desc={desc}&price={price}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Новый товар был добавлен в базу данных!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=delete_product&productid={productid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товар был удален из базы данных!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=addTo_cart&userid={userid}&productid={productid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товар был добавлен в корзину!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=remove_from_cart&userid={userid}&productid={productid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товар был удален из корзины!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=list_cart&userid={userid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товары были выведены!",<br>
+                        "other":[<br>
+                            {<br>
+                                "name":"MSI RTX 3070",<br>
+                                "description":"videocard"<br>
+                            }<br>
+                        ],<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"16",<br>
+                            "i":"14",<br>
+                            "s":"11",<br>
+                            "full":"2023-01-30 16:14:11"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=addTo_favorite&userid={userid}&productid={productid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товар был добавлен в избранное!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=remove_from_favorite&userid={userid}&productid={productid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товар был удален из избранного!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=list_favorite&userid={userid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товары были выведены!",<br>
+                        "other":[<br>
+                            {<br>
+                                "name":"Ryzen 5 3600",<br>
+                                "description":"processor"<br>
+                            }<br>
+                        ],<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"16",<br>
+                            "i":"19",<br>
+                            "s":"06",<br>
+                            "full":"2023-01-30 16:19:06"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=set_order&userid={userid}&productid={productid}&address={address}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Заказ составлен!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=cancel_order&orderid={orderid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Заказ отменен!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=add_image_product&productid={orderid}&url={url}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Фото добавлено!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"15",<br>
+                            "i":"52",<br>
+                            "s":"58",<br>
+                            "full":"2023-01-30 15:52:58"<br>
+                        }<br>
+                    }                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>https://dev.rea.hrel.ru/BVV/?token={token}&type=list_orders&userid={userid}</td>
+                    <td>{<br>
+                        "error":false,<br>
+                        "type":"SUCCESS",<br>
+                        "title":"Успех!",<br>
+                        "desc":"Товары были выведены!",<br>
+                        "other":[<br>
+                            {<br>
+                                "name":"Ryzen 5 3600",<br>
+                                "description":"processor"<br>
+                            }<br>
+                        ],<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"30",<br>
+                            "H":"16",<br>
+                            "i":"24",<br>
+                            "s":"45",<br>
+                            "full":"2023-01-30 16:24:45"<br>
+                        }<br>
+                    }
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="in_params">
+            <h2>Входные параметры</h2>
+            <table border="2" width="50%" cellspacing="0" bordercolor="#36403A">
+                <tr bgcolor="#DCF2E6">
+                    <td widht="5%">Параметр</td>
+                    <td widht="5%">Тип данных</td>
+                    <td widht="5%">Обязательность</td>
+                    <td>Описание</td>
+                </tr>
+                <tr>
+                    <a name="token"></a>
+                    <td>token</td>
+                    <td>string</td>
+                    <td>да</td>
+                    <td>Токены выдаются разработчикам для идентификации их приложения</td>
+                </tr>
+                <tr>
+                    <a name="type"></a>
+                    <td>type</td>
+                    <td>string</td>
+                    <td>да</td>
+                    <td>Этот параметр описывает конкретные функции API</td>
+                </tr>
+                <tr>
+                    <a name="login"></a>
+                    <td>login</td>
+                    <td>string</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит логин пользователя</td>
+                </tr>
+                <tr>
+                    <a name="pass"></a>
+                    <td>pass</td>
+                    <td>string</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит пароль пользователя</td>
+                </tr>
+                <tr>
+                    <a name="userid"></a>
+                    <td>userid</td>
+                    <td>int</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит ID пользователя</td>
+                </tr>
+                <tr>
+                    <a name="url"></a>
+                    <td>url</td>
+                    <td>string</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит адрес на изображение</td>
+                </tr>
+                <tr>
+                    <a name="name"></a>
+                    <td>name</td>
+                    <td>string</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит название товара</td>
+                </tr>
+                <tr>
+                    <a name="desc"></a>
+                    <td>desc</td>
+                    <td>string</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит описание товара</td>
+                </tr>
+                <tr>
+                    <a name="price"></a>
+                    <td>price</td>
+                    <td>int</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит цену товара</td>
+                </tr>
+                <tr>
+                    <a name="productid"></a>
+                    <td>productid</td>
+                    <td>int</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит ID товара</td>
+                </tr>
+                <tr>
+                    <a name="address"></a>
+                    <td>address</td>
+                    <td>string</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит адрес клиента для доставки</td>
+                </tr>
+                <tr>
+                    <a name="orderid"></a>
+                    <td>orderid</td>
+                    <td>int</td>
+                    <td>нет</td>
+                    <td>Этот параметр содержит ID заказа</td>
+                </tr>
+            </table>
+        </div>
+        <div class="out_params">
+            <h2>Выходные параметры</h2>
+
+            <h3>Положительный ответ</h3>
+            <p>Параметры аналогичны входным</p>
+
+            <h3>Ответ с ошибками</h3>
+            <p>Ответ в формате JSON с описанием ошибки</p>
+            <table border="2" width="50%" cellspacing="0" bordercolor="#36403A">
+                <tr bgcolor="#DCF2E6">
+                    <td>Ошибка</td>
+                    <td>Ответ</td>
+                </tr>
+                <tr>
+                    <td>Не указан необходимый GET-параметр</td>
+                    <td>{<br>
+                        <br>
+                        "error":true,<br>
+                        "type":"ERROR",<br>
+                        "title":"Ошибка!",<br>
+                        "desc":"Ошибка в запросе!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"31",<br>
+                            "H":"09",<br>
+                            "i":"31",<br>
+                            "s":"48",<br>
+                            "full":"2023-01-31 09:31:48"<br>
+                        }<br>
+                        <br>
+                    }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ошибка в запросе</td>
+                    <td>{<br>
+                        <br>
+                        "error":true,<br>
+                        "type":"ERROR",<br>
+                        "title":"Ошибка!",<br>
+                        "desc":"Ошибка в запросе!",<br>
+                        "other":null,<br>
+                        "datetime":{<br>
+                            "Y":"2023",<br>
+                            "m":"01",<br>
+                            "d":"31",<br>
+                            "H":"09",<br>
+                            "i":"31",<br>
+                            "s":"48",<br>
+                            "full":"2023-01-31 09:31:48"<br>
+                        }<br>
+                        <br>
+                    }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
