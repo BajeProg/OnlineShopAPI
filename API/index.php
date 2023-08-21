@@ -1,4 +1,6 @@
 <?php 
+header('Content-Type: application/json');
+
 include_once("functions.php");
 include_once("find_token.php");
 
@@ -105,13 +107,55 @@ if(preg_match_all("/^auth_user$/ui", $_GET['type'])){
         }
     }
 
-    $query = "SELECT `id`, `login`, `image`, `cart`, `favorites` FROM `users` WHERE `login`='".$_GET['login']."' AND `password`='".$_GET['pass']."' ";
+    
+    $hash = hash('md5', $_GET['login'].date(DATE_RFC822).$_GET['pass']);
+    if(isset($_GET["session"])) $hash = $_GET["session"];
+    if(isset($_SERVER['HTTP_USER_AGENT'])) $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    else $user_agent = "";
+    $query = "INSERT INTO `sessions`(`token`, `user_agent`, `ip`, `user_id`) VALUES ('".$hash."', '".$user_agent."', '".$_SERVER['REMOTE_ADDR']."', (SELECT `id` FROM `users` WHERE `login`='".$_GET['login']."' AND `password`='".$_GET['pass']."'))";
     $res_query = mysqli_query($connection,$query);
 
     if(!$res_query){
         echo ajax_echo(
             "Ошибка!", 
-            "Ошибка в запросе 2!",
+            "Ошибка в запросе!",
+            true,
+            "ERROR",
+            null
+        );
+        exit($query);
+    }
+
+    echo ajax_echo(
+        "Успех!", 
+        "Сессия создана!",
+        false,
+        "SUCCESS",
+        $hash
+    );
+}
+
+//enter
+if(preg_match_all("/^enter_session$/ui", $_GET['type'])){
+    if(!isset($_GET['session_token'])){
+        echo ajax_echo(
+            "Ошибка!",
+            "Вы не указали GET параметр session_token!",
+            "ERROR",
+            null
+        );
+        exit;
+    }
+
+    if(isset($_SERVER['HTTP_USER_AGENT'])) $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    else $user_agent = "";
+    $query = "SELECT COUNT(id) AS `num` FROM `sessions` WHERE `token`='".$_GET['session_token']."' AND `user_agent`='".$user_agent."' AND `closed`=false";
+    $res_query = mysqli_query($connection,$query);
+
+    if(!$res_query){
+        echo ajax_echo(
+            "Ошибка!", 
+            "Ошибка в запросе!",
             true,
             "ERROR",
             null
@@ -119,19 +163,70 @@ if(preg_match_all("/^auth_user$/ui", $_GET['type'])){
         exit();
     }
 
-    $arr_res = array();
     $rows = mysqli_num_rows($res_query);
 
     for ($i=0; $i < $rows; $i++){
         $row = mysqli_fetch_assoc($res_query);
-        array_push($arr_res, $row);
+        if($row["num"] == "0"){
+            echo ajax_echo(
+                "Ошибка!", 
+                "Сессия отсутствует!",
+                true,
+                "ERROR",
+                null
+            );
+            exit();
+        }
     }
+
+    $query = "SELECT
+    u.`id`,
+    u.`login`,
+    u.`image`,
+    u.`cart`,
+    u.`favorites`,
+    ar.`right` AS `access_rights`
+    FROM
+    `users` u
+    JOIN
+    (
+        SELECT
+            `user_id`,
+            MAX(`id`) AS `latest_session_id`
+        FROM
+            `sessions`
+        WHERE
+            `token` = '".$_GET['session_token']."'
+        GROUP BY
+            `user_id`
+    ) latest_session
+    ON
+    u.`id` = latest_session.`user_id`
+    LEFT JOIN
+    `access_rights` ar
+    ON
+    ar.`id` = u.`access_rights`;";
+
+    $res_query = mysqli_query($connection,$query);
+
+    if(!$res_query){
+        echo ajax_echo(
+            "Ошибка!", 
+            "Ошибка в запросе 2!<br>".$query,
+            true,
+            "ERROR",
+            null
+        );
+        exit();
+    }
+
+    $res = mysqli_fetch_assoc($res_query);
     echo ajax_echo(
         "Успех!", 
         "Пользователь авторизирован!",
         false,
         "SUCCESS",
-        $arr_res
+        $res
     );
     exit();
 }
@@ -182,7 +277,22 @@ if(preg_match_all("/^load_user_image$/ui", $_GET['type'])){
 
 //Вывод всех продуктов
 if(preg_match_all("/^list_product|lst_prd$/ui", $_GET['type'])){
-    $query = "SELECT id, name, description FROM products WHERE `deleted` = FALSE";
+    if(isset($_GET["product_id"])) $id = " AND p.id = ".$_GET["product_id"];
+    else $id = "";
+
+    $query = "SELECT
+    p.id,
+    p.name,
+    p.description,
+    p.price,
+    i.url AS image
+    FROM
+    products p
+    LEFT JOIN
+    images i ON i.productid = p.id
+    WHERE
+    p.deleted = 0".$id;
+
     $res_query = mysqli_query($connection,$query);
 
     if(!$res_query){
@@ -276,7 +386,7 @@ else if(preg_match_all("/^delete_product|del_prd$/ui", $_GET['type'])){
         );
         exit;
     }
-    $query = "UPDATE `products` SET `is_deleted` = '1' WHERE `products`.`id` = ".$_GET['productid'];
+    $query = "UPDATE `products` SET `deleted` = '1' WHERE `products`.`id` = ".$_GET['productid'];
     
     $res_query = mysqli_query($connection, $query);
     
@@ -362,7 +472,11 @@ else if(preg_match_all("/^remove_from_cart$/ui", $_GET['type'])){
         );
         exit;
     }
-    $query = "UPDATE `cart_items` SET `deleted`=true WHERE `product`=".$_GET['productid']." AND `cartid`=(SELECT `cart` FROM `users` WHERE `id` = ".$_GET['userid'].")";
+    $query = "UPDATE `cart_items` ci
+    JOIN `users` u ON ci.`cartid` = u.`cart`
+    SET ci.`deleted` = 1
+    WHERE ci.`product` = ".$_GET['productid']."
+    AND u.`id` = ".$_GET['userid'];
     
     $res_query = mysqli_query($connection, $query);
     
@@ -396,7 +510,24 @@ else if(preg_match_all("/^list_cart$/ui", $_GET['type'])){
         );
         exit;
     }
-    $query = "SELECT `name`, `description` from `products` WHERE `id` IN (SELECT `product` FROM `cart_items` WHERE `cartid`=(SELECT `cart` FROM `users` WHERE `id`=".$_GET['userid'].") AND `deleted`=false)";
+    $query = "SELECT
+    p.id,
+    p.name,
+    p.description,
+    p.price,
+    i.url AS image
+    FROM
+    `products` p
+    LEFT JOIN
+    `images` i ON i.productid = p.id
+    WHERE
+    p.id IN (
+        SELECT ci.`product`
+        FROM `cart_items` ci
+        JOIN `users` u ON ci.`cartid` = u.`cart`
+        WHERE u.`id` = ".$_GET['userid']."
+        AND ci.`deleted` = 0
+    );";
     
     $res_query = mysqli_query($connection, $query);
     
@@ -491,7 +622,11 @@ else if(preg_match_all("/^remove_from_favorite$/ui", $_GET['type'])){
         );
         exit;
     }
-    $query = "UPDATE `favorite_items` SET `deleted`=true WHERE `product`=".$_GET['productid']." AND `cartid`=(SELECT `favorites` FROM `users` WHERE `id` = ".$_GET['userid'].")";
+    $query = "UPDATE `favorite_items` fi
+    JOIN `users` u ON fi.`cartid` = u.`favorites`
+    SET fi.`deleted` = 1
+    WHERE fi.`product` = ".$_GET['productid']." 
+    AND u.`id` = ".$_GET['userid'];
     
     $res_query = mysqli_query($connection, $query);
     
@@ -525,7 +660,24 @@ else if(preg_match_all("/^list_favorite$/ui", $_GET['type'])){
         );
         exit;
     }
-    $query = "SELECT `name`, `description` from `products` WHERE `id` IN (SELECT `product` FROM `favorite_items` WHERE `favoriteid`=(SELECT `favorites` FROM `users` WHERE `id`=".$_GET['userid'].") AND `deleted`=false)";
+    $query = "SELECT
+    p.id,
+    p.name,
+    p.description,
+    p.price,
+    i.url AS image
+    FROM
+    `products` p
+    LEFT JOIN
+    `images` i ON i.productid = p.id
+    WHERE
+    p.id IN (
+        SELECT fi.`product`
+        FROM `favorite_items` fi
+        JOIN `users` u ON fi.`favoriteid` = u.`favorites`
+        WHERE u.`id` = ".$_GET['userid']." 
+        AND fi.`deleted` = 0
+    );";
     
     $res_query = mysqli_query($connection, $query);
     
@@ -697,7 +849,19 @@ else if(preg_match_all("/^list_orders$/ui", $_GET['type'])){
         );
         exit;
     }
-    $query = "SELECT `name`, `description` FROM `products` WHERE `id` IN (SELECT `product` FROM `order` WHERE `userid` = ".$_GET['userid']." AND `deleted`=false)";
+    $query = "SELECT
+    o.`id`,
+    o.`product`,
+    o.`adress`,
+    os.`name` AS `status`,
+    o.`date`
+    FROM
+    `order` o
+    LEFT JOIN
+    `order_statuses` os ON os.`id` = o.`status`
+    WHERE
+    o.`userid` = ".$_GET['userid']." 
+    AND o.`deleted` = 0;";
     
     $res_query = mysqli_query($connection, $query);
     
@@ -716,6 +880,20 @@ else if(preg_match_all("/^list_orders$/ui", $_GET['type'])){
 
     for ($i=0; $i < $rows; $i++){
         $row = mysqli_fetch_assoc($res_query);
+
+        $query2 = "SELECT id, name, description, price, (SELECT url FROM images WHERE productid = `products`.`id`) as image FROM products WHERE `deleted` = FALSE AND id = ".$row['product'];
+        $rez = mysqli_query($connection, $query2);
+        if(!$rez){
+            echo ajax_echo(
+                "Ошибка!",
+                "Ошибка в запросе2!",
+                true,
+                null
+            );
+            exit;
+        }
+        $row['product'] = mysqli_fetch_assoc($rez);
+
         array_push($arr_res, $row);
     }
     
@@ -728,8 +906,6 @@ else if(preg_match_all("/^list_orders$/ui", $_GET['type'])){
     );
     exit;
 }
-
-
 
 else{
     echo ajax_echo(
